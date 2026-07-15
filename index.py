@@ -125,20 +125,6 @@ def interseccion_arbol(A, B): # Complejidad esperada: O(n*log(n) + m*log(n))
 
     return comunes
 
-# Verificar que los algoritmos funcionen bien
-"""
-A_test = [4, 8, 5, 15, 3, 6, 2]
-B_test = [10, 3, 1, 8, 9]
-
-print(f"Resultado Fuerza Bruta: {interseccion_fuerza_bruta(A_test, B_test)}")
-
-Fuerza Bruta si devuelve como en el ejemplo [8, 3]
-
-print(f"Resultado Árbol: {interseccion_arbol(A_test, B_test)}")
-
-Árbol si devuelve como en el ejemplo [3, 8]
-"""
-
 # Tamaños de los arreglos (n y m) a evaluar
 casos = [
     (100, 80),
