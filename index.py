@@ -21,7 +21,21 @@ def interseccion_fuerza_bruta(A, B): # Complejidad esperada: O(n) * O(m)
 
 # 2. Algoritmo de Mapa (Josue)
 def interseccion_mapas(A, B): # Complejidad esperada: O(n) + O(m)*O(1)
-    pass
+    
+    if len(B) > len(A):
+        A, B = B, A
+
+    mapa = {
+        numero: indice for indice, numero in enumerate(A)
+    }
+    interseccion = []
+
+    for num in B:
+        if num in mapa:
+            interseccion.append(num)
+            del mapa[num]
+
+    return interseccion
 
 # 3. Algoritmo de Árbol (Nahim)
 class Nodo:
@@ -140,7 +154,7 @@ casos = [
 ]
     
 tiempos_fbruta = []
-# tiempos_mapa = [] # Descomenta Josue cuando tengas tu parte
+tiempos_mapa = []
 tiempos_arbol = []
 
 for n, m in casos:
@@ -154,9 +168,9 @@ for n, m in casos:
     tiempos_fbruta.append(time.perf_counter() - inicio)
         
     # Tiempos Mapa
-    # inicio = time.perf_counter()
-    # interseccion_mapas(A, B)
-    # tiempos_mapas.append(time.perf_counter() - inicio)
+    inicio = time.perf_counter()
+    interseccion_mapas(A, B)
+    tiempos_mapa.append(time.perf_counter() - inicio)
         
     # Tiempos Arboles
     inicio = time.perf_counter()
@@ -178,7 +192,17 @@ plt.plot(
     marker='o',
     linestyle='-',
     color='red',
-    label='Fuerza Bruta (O(n*m))'
+    label='Fuerza Bruta (O(n * m))'
+)
+
+# Gráfica de Mapa
+plt.plot(
+    range(len(casos)),
+    tiempos_mapa,
+    marker='o',
+    linestyle='-',
+    color='blue',
+    label='Mapa (O(n + m))'
 )
 
 # Gráfica de Árbol
