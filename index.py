@@ -24,17 +24,105 @@ def interseccion_mapas(A, B): # Complejidad esperada: O(n) + O(m)*O(1)
     pass
 
 # 3. Algoritmo de Árbol (Nahim)
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.izq = None
+        self.der = None
+        self.altura = 1
+
+def altura(nodo):
+    return nodo.altura if nodo else 0
+
+def balance(nodo):
+    return altura(nodo.izq) - altura(nodo.der) if nodo else 0
+
+def actualizar_altura(nodo):
+    nodo.altura = 1 + max(altura(nodo.izq), altura(nodo.der))
+
+def rotar_derecha(y):
+    x = y.izq
+    y.izq = x.der
+    x.der = y
+    actualizar_altura(y)
+    actualizar_altura(x)
+    return x
+
+def rotar_izquierda(x):
+    y = x.der
+    x.der = y.izq
+    y.izq = x
+    actualizar_altura(x)
+    actualizar_altura(y)
+    return y
+
+def insertar(raiz, valor):
+    if raiz is None:
+        return Nodo(valor)
+    if valor < raiz.valor:
+        raiz.izq = insertar(raiz.izq, valor)
+    elif valor > raiz.valor:
+        raiz.der = insertar(raiz.der, valor)
+    else:
+        return raiz
+
+    actualizar_altura(raiz)
+    b = balance(raiz)
+
+    if b > 1 and valor < raiz.izq.valor:
+        return rotar_derecha(raiz)
+    if b < -1 and valor > raiz.der.valor:
+        return rotar_izquierda(raiz)
+    if b > 1 and valor > raiz.izq.valor:
+        raiz.izq = rotar_izquierda(raiz.izq)
+        return rotar_derecha(raiz)
+    if b < -1 and valor < raiz.der.valor:
+        raiz.der = rotar_derecha(raiz.der)
+        return rotar_izquierda(raiz)
+
+    return raiz
+
+def buscar(raiz, valor):
+    while raiz:
+        if valor == raiz.valor:
+            return True
+        elif valor < raiz.valor:
+            raiz = raiz.izq
+        else:
+            raiz = raiz.der
+    return False
+
 def interseccion_arbol(A, B): # Complejidad esperada: O(n*log(n) + m*log(n))
-    pass
+
+    # Construimos el árbol a partir del arreglo con mayor cantidad de elementos
+    if len(A) >= len(B):
+        mayor, menor = A, B
+    else:
+        mayor, menor = B, A
+
+    raiz = None
+    for x in mayor:
+        raiz = insertar(raiz, x)
+
+    comunes = []
+    for x in menor:
+        if buscar(raiz, x):
+            comunes.append(x)
+
+    return comunes
 
 # Verificar que los algoritmos funcionen bien
 """
 A_test = [4, 8, 5, 15, 3, 6, 2]
 B_test = [10, 3, 1, 8, 9]
 
-print(f"Resultado Fuerza Bruta: {interseccion_fuerza_bruta(A_test, B_test)}") 
+print(f"Resultado Fuerza Bruta: {interseccion_fuerza_bruta(A_test, B_test)}")
 
 Fuerza Bruta si devuelve como en el ejemplo [8, 3]
+
+print(f"Resultado Árbol: {interseccion_arbol(A_test, B_test)}")
+
+Árbol si devuelve como en el ejemplo [3, 8]
 """
 
 # Tamaños de los arreglos (n y m) a evaluar
@@ -53,7 +141,7 @@ casos = [
     
 tiempos_fbruta = []
 # tiempos_mapa = [] # Descomenta Josue cuando tengas tu parte
-# tiempos_arbol = [] # Descomentar Nahim cuando tengas tu parte
+tiempos_arbol = []
 
 for n, m in casos:
     # Generar arreglos aleatorios de tamaño n y m
@@ -71,9 +159,9 @@ for n, m in casos:
     # tiempos_mapas.append(time.perf_counter() - inicio)
         
     # Tiempos Arboles
-    # inicio = time.perf_counter()
-    # interseccion_arbol(A, B)
-    # tiempos_arbol.append(time.perf_counter() - inicio)
+    inicio = time.perf_counter()
+    interseccion_arbol(A, B)
+    tiempos_arbol.append(time.perf_counter() - inicio)
         
     print(f"Tamaño {n, m} procesado")
 
@@ -91,6 +179,16 @@ plt.plot(
     linestyle='-',
     color='red',
     label='Fuerza Bruta (O(n*m))'
+)
+
+# Gráfica de Árbol
+plt.plot(
+    range(len(casos)),
+    tiempos_arbol,
+    marker='o',
+    linestyle='-',
+    color='green',
+    label='Árbol AVL (O(n*log(n) + m*log(n)))'
 )
 
 # Pares (n, m) en el eje x
